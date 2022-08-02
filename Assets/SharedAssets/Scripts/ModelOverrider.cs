@@ -266,7 +266,7 @@ namespace Unity.MLAgentsExamples
             return asset;
         }
 
-        NNModel LoadOnnxModel(byte[] rawModel)
+        public NNModel LoadOnnxModel(byte[] rawModel)
         {
             var converter = new ONNXModelConverter(true);
             var onnxModel = converter.Convert(rawModel);

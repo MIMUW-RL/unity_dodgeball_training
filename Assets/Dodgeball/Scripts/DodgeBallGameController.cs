@@ -1,10 +1,21 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.MLAgents;
 using Random = UnityEngine.Random;
 using TMPro;
+using System.IO;
+using Unity.Barracuda;
+using Unity.Barracuda.ONNX;
+
+
+using System.Linq;
+using Unity.MLAgents.Sensors;
+using Unity.MLAgents.Policies;
+using Unity.MLAgentsExamples;
+using UnityEngine.UI;
+using System.Text;
 
 public class DodgeBallGameController : MonoBehaviour
 {
@@ -123,8 +134,32 @@ public class DodgeBallGameController : MonoBehaviour
 
     public int MaxEnvironmentSteps = 5000;
 
+    public List<string> modelPathList = new List<string>();
+    public List<NNModel> modelList = new List<NNModel>();
+    private ModelOverrider myModelOverrider;
+
+    void InitializeModelList()
+    {
+        //gamePlanDirectory
+        string[] filePaths = Directory.GetFiles("models", "*.onnx");
+        foreach (string path in filePaths)
+        {
+            Debug.Log("Loading  model ");
+            Debug.Log(path);
+            String modelName = path.Replace(".onnx", "");
+            modelPathList.Add(modelName);
+            byte[] rawModel = File.ReadAllBytes(path);
+            NNModel nnModel = myModelOverrider.LoadOnnxModel(rawModel);
+            nnModel.name = modelName;
+            modelList.Add(nnModel);
+        }
+
+    }
+
     void Start()
     {
+        myModelOverrider = GetComponentInChildren<ModelOverrider>();
+
         if (ShouldPlayEffects)
         {
             ResetPlayerUI();
@@ -173,6 +208,7 @@ public class DodgeBallGameController : MonoBehaviour
             }
         }
         m_Initialized = true;
+        InitializeModelList();
         ResetScene();
     }
 
@@ -645,17 +681,66 @@ public class DodgeBallGameController : MonoBehaviour
         //Reset the agents
         foreach (var item in Team0Players)
         {
+            item.Agent.Initialize();
             item.Agent.HitPointsRemaining = PlayerMaxHitPoints;
+            item.Agent.m_BehaviorParameters.TeamId = 0;
+            item.TeamID = 0;
+            item.Agent.NumberOfTimesPlayerCanBeHit = PlayerMaxHitPoints;
             item.Agent.gameObject.SetActive(true);
             item.Agent.ResetAgent();
+            var bp = item.Agent.GetComponent<BehaviorParameters>();
+            bp.BehaviorType = Unity.MLAgents.Policies.BehaviorType.Default;
+            bp.Model = null;
+            bp.DeterministicInference = false;
             m_Team0AgentGroup.RegisterAgent(item.Agent);
         }
         foreach (var item in Team1Players)
         {
+            item.Agent.Initialize();
             item.Agent.HitPointsRemaining = PlayerMaxHitPoints;
+            item.Agent.m_BehaviorParameters.TeamId = 1;
+            item.TeamID = 1;
+            item.Agent.NumberOfTimesPlayerCanBeHit = PlayerMaxHitPoints;
             item.Agent.gameObject.SetActive(true);
             item.Agent.ResetAgent();
+            var bp = item.Agent.GetComponent<BehaviorParameters>();
+            bp.BehaviorType = Unity.MLAgents.Policies.BehaviorType.Default;
+            bp.Model = null;
+            bp.DeterministicInference = false;
             m_Team1AgentGroup.RegisterAgent(item.Agent);
+        }
+
+        int num = Random.Range(0, 5);
+        print($"Rand {num} ");
+        int modelIndex = Random.Range(0, modelList.Count);
+        int playerIndex = 0;
+        foreach (var item in Team0Players)
+        {
+            if (playerIndex == num)
+            {
+                //item.Agent.SetModel(modelPathList[modelIndex], modelList[modelIndex]);
+                var bp = item.Agent.GetComponent<BehaviorParameters>();
+                bp.Model = modelList[modelIndex];
+                bp.BehaviorType = Unity.MLAgents.Policies.BehaviorType.InferenceOnly;
+                bp.DeterministicInference = true;
+            }
+            playerIndex++;
+        }
+        playerIndex = 0;
+        num = Random.Range(0, 5);
+        print($"Rand {num} ");
+        modelIndex = Random.Range(0, modelList.Count);
+        foreach (var item in Team1Players)
+        {
+            if (playerIndex == num)
+            {
+                //item.Agent.SetModel(modelPathList[modelIndex], modelList[modelIndex]);
+                var bp = item.Agent.GetComponent<BehaviorParameters>();
+                bp.Model = modelList[modelIndex];
+                bp.BehaviorType = Unity.MLAgents.Policies.BehaviorType.InferenceOnly;
+                bp.DeterministicInference = true;
+            }
+            playerIndex++;
         }
 
         if (GameMode == GameModeType.CaptureTheFlag)
