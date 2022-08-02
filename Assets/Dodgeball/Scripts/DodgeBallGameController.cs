@@ -17,6 +17,22 @@ using Unity.MLAgentsExamples;
 using UnityEngine.UI;
 using System.Text;
 
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
+
+
+
+public class EnvConfig
+{
+    [YamlMember(Alias = "defaultFraction", ApplyNamingConventions = false)]
+    public string defaultFraction { get; set; }
+    [YamlMember(Alias = "fixedPosition", ApplyNamingConventions = false)]
+    public int fixedPosition { get; set; }
+    [YamlMember(Alias = "symetric", ApplyNamingConventions = false)]
+    public int symetric { get; set; }
+}
+
+
 public class DodgeBallGameController : MonoBehaviour
 {
     //Are we training this platform or is this game/movie mode
@@ -137,6 +153,10 @@ public class DodgeBallGameController : MonoBehaviour
     public List<string> modelPathList = new List<string>();
     public List<NNModel> modelList = new List<NNModel>();
     private ModelOverrider myModelOverrider;
+
+    public float defaultFraction = 0.2f;
+    public int fixedPosition = -1;
+    public bool symetric = false;
 
     void InitializeModelList()
     {
@@ -710,7 +730,16 @@ public class DodgeBallGameController : MonoBehaviour
             m_Team1AgentGroup.RegisterAgent(item.Agent);
         }
 
-        int num = Random.Range(0, 5);
+        int maxBound = 4+(int)(4.0*defaultFraction);
+        int num = 0;
+        if (fixedPosition==-1)
+        {
+            num = Random.Range(0, maxBound);
+        }
+        else
+        {
+            num = fixedPosition;
+        }
         print($"Rand {num} ");
         int modelIndex = Random.Range(0, modelList.Count);
         int playerIndex = 0;
@@ -726,8 +755,13 @@ public class DodgeBallGameController : MonoBehaviour
             }
             playerIndex++;
         }
+
         playerIndex = 0;
-        num = Random.Range(0, 5);
+        if (fixedPosition == -1 && symetric==false)
+        {
+            num = Random.Range(0, maxBound);
+        }
+
         print($"Rand {num} ");
         modelIndex = Random.Range(0, modelList.Count);
         foreach (var item in Team1Players)
