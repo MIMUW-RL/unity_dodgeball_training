@@ -1,3 +1,4 @@
-defaultFraction : 0.2
+defaultNumber : 1
 fixedPosition : -1
 symetric : false
+sameModel : false

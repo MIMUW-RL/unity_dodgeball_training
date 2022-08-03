@@ -24,12 +24,14 @@ using YamlDotNet.Serialization.NamingConventions;
 
 public class EnvConfig
 {
-    [YamlMember(Alias = "defaultFraction", ApplyNamingConventions = false)]
-    public string defaultFraction { get; set; }
+    [YamlMember(Alias = "defaultNumber", ApplyNamingConventions = false)]
+    public int defaultNumber { get; set; }
     [YamlMember(Alias = "fixedPosition", ApplyNamingConventions = false)]
     public int fixedPosition { get; set; }
     [YamlMember(Alias = "symetric", ApplyNamingConventions = false)]
-    public int symetric { get; set; }
+    public bool symetric { get; set; }
+    [YamlMember(Alias = "sameModel", ApplyNamingConventions = false)]
+    public bool sameModel { get; set; }
 }
 
 
@@ -154,9 +156,10 @@ public class DodgeBallGameController : MonoBehaviour
     public List<NNModel> modelList = new List<NNModel>();
     private ModelOverrider myModelOverrider;
 
-    public float defaultFraction = 0.2f;
+    public int defaultNumber = 1;
     public int fixedPosition = -1;
     public bool symetric = false;
+    public bool sameModel = false;
 
     void InitializeModelList()
     {
@@ -188,6 +191,17 @@ public class DodgeBallGameController : MonoBehaviour
 
     void Initialize()
     {
+        var deserializer = new YamlDotNet.Serialization.DeserializerBuilder()
+    .WithNamingConvention(CamelCaseNamingConvention.Instance)
+    .Build();
+        string yaml_file = System.IO.File.ReadAllText(@"env_config.yaml");
+        var obj = deserializer.Deserialize<EnvConfig>(yaml_file);
+        defaultNumber = obj.defaultNumber;
+        fixedPosition = obj.fixedPosition;
+        symetric = obj.symetric;
+        sameModel = obj.sameModel; 
+
+
         m_audioSource = gameObject.AddComponent<AudioSource>();
         m_StatsRecorder = Academy.Instance.StatsRecorder;
         m_EnvParameters = Academy.Instance.EnvironmentParameters;
@@ -730,7 +744,7 @@ public class DodgeBallGameController : MonoBehaviour
             m_Team1AgentGroup.RegisterAgent(item.Agent);
         }
 
-        int maxBound = 4+(int)(4.0*defaultFraction);
+        int maxBound = 4+defaultNumber;
         int num = 0;
         if (fixedPosition==-1)
         {
@@ -740,7 +754,7 @@ public class DodgeBallGameController : MonoBehaviour
         {
             num = fixedPosition;
         }
-        print($"Rand {num} ");
+
         int modelIndex = Random.Range(0, modelList.Count);
         int playerIndex = 0;
         foreach (var item in Team0Players)
@@ -762,8 +776,11 @@ public class DodgeBallGameController : MonoBehaviour
             num = Random.Range(0, maxBound);
         }
 
-        print($"Rand {num} ");
-        modelIndex = Random.Range(0, modelList.Count);
+
+        if (sameModel == false)
+        {
+            modelIndex = Random.Range(0, modelList.Count);
+        }
         foreach (var item in Team1Players)
         {
             if (playerIndex == num)
