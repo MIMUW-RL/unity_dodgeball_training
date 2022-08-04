@@ -746,11 +746,11 @@ public class DodgeBallGameController : MonoBehaviour
 
         int maxBound = 4+defaultNumber;
         int num = 0;
-        if (fixedPosition==-1)
-        {
-            num = Random.Range(0, maxBound);
-        }
-        else
+        
+        
+        num = Random.Range(0, maxBound);
+
+        if (fixedPosition == -1 && num<4)
         {
             num = fixedPosition;
         }
