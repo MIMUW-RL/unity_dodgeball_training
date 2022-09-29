@@ -45,6 +45,8 @@ public class DodgeBallGameController : MonoBehaviour
         Training,
         Movie,
     }
+
+    public string EnvConfigPath = @"env_config.yaml";
     public SceneType CurrentSceneType = SceneType.Training;
 
     public bool ShouldPlayEffects
@@ -189,18 +191,8 @@ public class DodgeBallGameController : MonoBehaviour
         }
     }
 
-    void Initialize()
-    {
-        var deserializer = new YamlDotNet.Serialization.DeserializerBuilder()
-    .WithNamingConvention(CamelCaseNamingConvention.Instance)
-    .Build();
-        string yaml_file = System.IO.File.ReadAllText(@"env_config.yaml");
-        var obj = deserializer.Deserialize<EnvConfig>(yaml_file);
-        defaultNumber = obj.defaultNumber;
-        fixedPosition = obj.fixedPosition;
-        symetric = obj.symetric;
-        sameModel = obj.sameModel; 
-
+    void Initialize() {
+        ApplyEnvConfig();
 
         m_audioSource = gameObject.AddComponent<AudioSource>();
         m_StatsRecorder = Academy.Instance.StatsRecorder;
@@ -211,8 +203,7 @@ public class DodgeBallGameController : MonoBehaviour
         InstantiateBalls();
 
         //INITIALIZE AGENTS
-        foreach (var item in Team0Players)
-        {
+        foreach (var item in Team0Players) {
             item.Agent.Initialize();
             item.Agent.HitPointsRemaining = PlayerMaxHitPoints;
             item.Agent.m_BehaviorParameters.TeamId = 0;
@@ -220,8 +211,7 @@ public class DodgeBallGameController : MonoBehaviour
             item.Agent.NumberOfTimesPlayerCanBeHit = PlayerMaxHitPoints;
             m_Team0AgentGroup.RegisterAgent(item.Agent);
         }
-        foreach (var item in Team1Players)
-        {
+        foreach (var item in Team1Players) {
             item.Agent.Initialize();
             item.Agent.HitPointsRemaining = PlayerMaxHitPoints;
             item.Agent.m_BehaviorParameters.TeamId = 1;
@@ -234,16 +224,26 @@ public class DodgeBallGameController : MonoBehaviour
         SetActiveLosers(purpleLosersList, 0);
 
         //Poof Particles
-        if (usePoofParticlesOnElimination)
-        {
-            foreach (var item in poofParticlesList)
-            {
+        if (usePoofParticlesOnElimination) {
+            foreach (var item in poofParticlesList) {
                 item.SetActive(false);
             }
         }
         m_Initialized = true;
         InitializeModelList();
         ResetScene();
+    }
+
+    private void ApplyEnvConfig() {
+        var deserializer = new YamlDotNet.Serialization.DeserializerBuilder()
+    .WithNamingConvention(CamelCaseNamingConvention.Instance)
+    .Build();
+        string yaml_file = System.IO.File.ReadAllText(EnvConfigPath);
+        var obj = deserializer.Deserialize<EnvConfig>(yaml_file);
+        defaultNumber = obj.defaultNumber;
+        fixedPosition = obj.fixedPosition;
+        symetric = obj.symetric;
+        sameModel = obj.sameModel;
     }
 
     //Instantiate balls and add them to the pool
@@ -754,6 +754,8 @@ public class DodgeBallGameController : MonoBehaviour
         {
             num = fixedPosition;
         }
+
+        ApplyEnvConfig();
 
         int modelIndex = Random.Range(0, modelList.Count);
         int playerIndex = 0;
