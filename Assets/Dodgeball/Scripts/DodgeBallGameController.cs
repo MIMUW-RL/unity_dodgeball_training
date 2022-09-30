@@ -246,10 +246,10 @@ public class DodgeBallGameController : MonoBehaviour
     .Build();
         string yaml = File.ReadAllText(EnvConfigPath);
         envConfig = deserializer.Deserialize<EnvConfig>(yaml);
-        print("loading: " + envConfig.trainerStatusPath);
+        //print("loading: " + envConfig.trainerStatusPath);
         yaml = File.ReadAllText(envConfig.trainerStatusPath);
         trainerStatus = deserializer.Deserialize<TrainerStatus>(yaml);
-        print("trainerStatus.learningTeamId: " + trainerStatus.learningTeamId);
+        //print("trainerStatus.learningTeamId: " + trainerStatus.learningTeamId);
     }
 
     //Instantiate balls and add them to the pool
@@ -762,17 +762,20 @@ public class DodgeBallGameController : MonoBehaviour
 
         int modelIndex = Random.Range(0, modelList.Count);
         int playerIndex = 0;
-        foreach (var item in Team0Players)
-        {
-            if (playerIndex == num)
+        if(trainerStatus.learningTeamId == 0){
+            foreach (var item in Team0Players)
             {
-                //item.Agent.SetModel(modelPathList[modelIndex], modelList[modelIndex]);
-                var bp = item.Agent.GetComponent<BehaviorParameters>();
-                bp.Model = modelList[modelIndex];
-                bp.BehaviorType = Unity.MLAgents.Policies.BehaviorType.InferenceOnly;
-                bp.DeterministicInference = true;
+                if (playerIndex == num)
+                {
+                    print("setting agent with id=" + playerIndex + " in team=" + trainerStatus.learningTeamId + " to model id=" + modelIndex);
+                    //item.Agent.SetModel(modelPathList[modelIndex], modelList[modelIndex]);
+                    var bp = item.Agent.GetComponent<BehaviorParameters>();
+                    bp.Model = modelList[modelIndex];
+                    bp.BehaviorType = Unity.MLAgents.Policies.BehaviorType.InferenceOnly;
+                    bp.DeterministicInference = true;
+                }
+                playerIndex++;
             }
-            playerIndex++;
         }
 
         playerIndex = 0;
@@ -786,17 +789,20 @@ public class DodgeBallGameController : MonoBehaviour
         {
             modelIndex = Random.Range(0, modelList.Count);
         }
-        foreach (var item in Team1Players)
-        {
-            if (playerIndex == num)
+        if(trainerStatus.learningTeamId == 1){
+            foreach (var item in Team1Players)
             {
-                //item.Agent.SetModel(modelPathList[modelIndex], modelList[modelIndex]);
-                var bp = item.Agent.GetComponent<BehaviorParameters>();
-                bp.Model = modelList[modelIndex];
-                bp.BehaviorType = Unity.MLAgents.Policies.BehaviorType.InferenceOnly;
-                bp.DeterministicInference = true;
+                if (playerIndex == num)
+                {
+                    print("setting agent with id=" + playerIndex + " in team=" + trainerStatus.learningTeamId + " to model id=" + modelIndex);
+                    //item.Agent.SetModel(modelPathList[modelIndex], modelList[modelIndex]);
+                    var bp = item.Agent.GetComponent<BehaviorParameters>();
+                    bp.Model = modelList[modelIndex];
+                    bp.BehaviorType = Unity.MLAgents.Policies.BehaviorType.InferenceOnly;
+                    bp.DeterministicInference = true;
+                }
+                playerIndex++;
             }
-            playerIndex++;
         }
 
         if (GameMode == GameModeType.CaptureTheFlag)
