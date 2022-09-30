@@ -20,18 +20,20 @@ using System.Text;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
-
-
-public class EnvConfig
+[Serializable]
+public class TrainerStatus
 {
-    [YamlMember(Alias = "defaultNumber", ApplyNamingConventions = false)]
-    public int defaultNumber { get; set; }
-    [YamlMember(Alias = "fixedPosition", ApplyNamingConventions = false)]
-    public int fixedPosition { get; set; }
-    [YamlMember(Alias = "symetric", ApplyNamingConventions = false)]
-    public bool symetric { get; set; }
-    [YamlMember(Alias = "sameModel", ApplyNamingConventions = false)]
-    public bool sameModel { get; set; }
+    public int learningTeamId;
+}
+
+[Serializable]
+public class EnvConfig
+{ 
+    public int defaultNumber;
+    public int fixedPosition;
+    public bool symetric;
+    public bool sameModel;
+    public string trainerStatusPath;
 }
 
 
@@ -47,6 +49,9 @@ public class DodgeBallGameController : MonoBehaviour
     }
 
     public string EnvConfigPath = @"env_config.yaml";
+    public EnvConfig envConfig;
+    public TrainerStatus trainerStatus;
+
     public SceneType CurrentSceneType = SceneType.Training;
 
     public bool ShouldPlayEffects
@@ -158,10 +163,11 @@ public class DodgeBallGameController : MonoBehaviour
     public List<NNModel> modelList = new List<NNModel>();
     private ModelOverrider myModelOverrider;
 
-    public int defaultNumber = 1;
-    public int fixedPosition = -1;
-    public bool symetric = false;
-    public bool sameModel = false;
+    //public int defaultNumber = 1;
+    //public int fixedPosition = -1;
+    //public bool symetric = false;
+    //public bool sameModel = false;
+    //public string trainerStatusPath = "";
 
     void InitializeModelList()
     {
@@ -238,12 +244,11 @@ public class DodgeBallGameController : MonoBehaviour
         var deserializer = new YamlDotNet.Serialization.DeserializerBuilder()
     .WithNamingConvention(CamelCaseNamingConvention.Instance)
     .Build();
-        string yaml_file = System.IO.File.ReadAllText(EnvConfigPath);
-        var obj = deserializer.Deserialize<EnvConfig>(yaml_file);
-        defaultNumber = obj.defaultNumber;
-        fixedPosition = obj.fixedPosition;
-        symetric = obj.symetric;
-        sameModel = obj.sameModel;
+        string yaml = File.ReadAllText(EnvConfigPath);
+        envConfig = deserializer.Deserialize<EnvConfig>(yaml);
+
+        yaml = File.ReadAllText(envConfig.trainerStatusPath);
+        trainerStatus = deserializer.Deserialize<TrainerStatus>(yaml);
     }
 
     //Instantiate balls and add them to the pool
@@ -744,15 +749,12 @@ public class DodgeBallGameController : MonoBehaviour
             m_Team1AgentGroup.RegisterAgent(item.Agent);
         }
 
-        int maxBound = 4+defaultNumber;
-        int num = 0;
-        
-        
-        num = Random.Range(0, maxBound);
+        int maxBound = 4 + envConfig.defaultNumber;
+        int num = Random.Range(0, maxBound);
 
-        if (fixedPosition == -1 && num<4)
+        if (envConfig.fixedPosition == -1 && num<4)
         {
-            num = fixedPosition;
+            num = envConfig.fixedPosition;
         }
 
         ApplyEnvConfig();
@@ -773,13 +775,13 @@ public class DodgeBallGameController : MonoBehaviour
         }
 
         playerIndex = 0;
-        if (fixedPosition == -1 && symetric==false)
+        if (envConfig.fixedPosition == -1 && envConfig.symetric ==false)
         {
             num = Random.Range(0, maxBound);
         }
 
 
-        if (sameModel == false)
+        if (envConfig.sameModel == false)
         {
             modelIndex = Random.Range(0, modelList.Count);
         }
