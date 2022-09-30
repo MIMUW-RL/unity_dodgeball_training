@@ -246,9 +246,10 @@ public class DodgeBallGameController : MonoBehaviour
     .Build();
         string yaml = File.ReadAllText(EnvConfigPath);
         envConfig = deserializer.Deserialize<EnvConfig>(yaml);
-
+        print("loading: " + envConfig.trainerStatusPath);
         yaml = File.ReadAllText(envConfig.trainerStatusPath);
         trainerStatus = deserializer.Deserialize<TrainerStatus>(yaml);
+        print("trainerStatus.learningTeamId: " + trainerStatus.learningTeamId);
     }
 
     //Instantiate balls and add them to the pool
