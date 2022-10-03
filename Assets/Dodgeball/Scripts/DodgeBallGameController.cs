@@ -29,10 +29,9 @@ public class TrainerStatus
 [Serializable]
 public class EnvConfig
 { 
-    public int defaultNumber;
     public int fixedPosition;
-    public bool symetric;
     public bool sameModel;
+    public bool coplayLearningTeamOnly;
     public string trainerStatusPath;
 }
 
@@ -750,10 +749,10 @@ public class DodgeBallGameController : MonoBehaviour
             m_Team1AgentGroup.RegisterAgent(item.Agent);
         }
 
-        int maxBound = 4 + envConfig.defaultNumber;
+        //implementation of FCP injections
+        int maxBound = 4;
         int num = Random.Range(0, maxBound);
-
-        if (envConfig.fixedPosition == -1 && num<4)
+        if (envConfig.fixedPosition != -1)
         {
             num = envConfig.fixedPosition;
         }
@@ -762,7 +761,7 @@ public class DodgeBallGameController : MonoBehaviour
 
         int modelIndex = Random.Range(0, modelList.Count);
         int playerIndex = 0;
-        if(trainerStatus.learningTeamId == 0){
+        if( (trainerStatus.learningTeamId == 0) || (envConfig.coplayLearningTeamOnly == false) ){
             foreach (var item in Team0Players)
             {
                 if (playerIndex == num)
@@ -779,17 +778,17 @@ public class DodgeBallGameController : MonoBehaviour
         }
 
         playerIndex = 0;
-        if (envConfig.fixedPosition == -1 && envConfig.symetric ==false)
+        num = Random.Range(0, maxBound);
+        if (envConfig.fixedPosition != -1)
         {
-            num = Random.Range(0, maxBound);
+            num = envConfig.fixedPosition;
         }
-
-
         if (envConfig.sameModel == false)
         {
             modelIndex = Random.Range(0, modelList.Count);
         }
-        if(trainerStatus.learningTeamId == 1){
+
+        if( (trainerStatus.learningTeamId == 1) || (envConfig.coplayLearningTeamOnly == false) ){
             foreach (var item in Team1Players)
             {
                 if (playerIndex == num)

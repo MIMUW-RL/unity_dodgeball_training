@@ -1,5 +1,4 @@
-defaultNumber : 1
 fixedPosition : -1
-symetric : false
+coplayLearningTeamOnly : true
 sameModel : false
 trainerStatusPath : "trainer_status.yaml"
