@@ -766,7 +766,7 @@ public class DodgeBallGameController : MonoBehaviour
             {
                 if (playerIndex == num)
                 {
-                    print("setting agent with id=" + playerIndex + " in team=" + trainerStatus.learningTeamId + " to model id=" + modelIndex);
+                    print("setting agent with id=" + playerIndex + " in team0 to model id=" + modelIndex);
                     //item.Agent.SetModel(modelPathList[modelIndex], modelList[modelIndex]);
                     var bp = item.Agent.GetComponent<BehaviorParameters>();
                     bp.Model = modelList[modelIndex];
@@ -793,7 +793,7 @@ public class DodgeBallGameController : MonoBehaviour
             {
                 if (playerIndex == num)
                 {
-                    print("setting agent with id=" + playerIndex + " in team=" + trainerStatus.learningTeamId + " to model id=" + modelIndex);
+                    print("setting agent with id=" + playerIndex + " in team1 to model id=" + modelIndex);
                     //item.Agent.SetModel(modelPathList[modelIndex], modelList[modelIndex]);
                     var bp = item.Agent.GetComponent<BehaviorParameters>();
                     bp.Model = modelList[modelIndex];
