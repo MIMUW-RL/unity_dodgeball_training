@@ -28,11 +28,11 @@ public class TrainerStatus
 
 [Serializable]
 public class EnvConfig
-{ 
-    public int fixedPosition;
+{     
     public bool sameModel;
     public bool coplayLearningTeamOnly;
     public string trainerStatusPath;
+    public int numberOfCoplay;
 }
 
 
@@ -161,12 +161,6 @@ public class DodgeBallGameController : MonoBehaviour
     public List<string> modelPathList = new List<string>();
     public List<NNModel> modelList = new List<NNModel>();
     private ModelOverrider myModelOverrider;
-
-    //public int defaultNumber = 1;
-    //public int fixedPosition = -1;
-    //public bool symetric = false;
-    //public bool sameModel = false;
-    //public string trainerStatusPath = "";
 
     void InitializeModelList()
     {
@@ -751,11 +745,20 @@ public class DodgeBallGameController : MonoBehaviour
 
         //implementation of FCP injections
         int maxBound = 4;
-        int num = Random.Range(0, maxBound);
-        if (envConfig.fixedPosition != -1)
+        int coplayNr = envConfig.numberOfCoplay;
+        
+        var _random = new System.Random();
+
+        var numbers = Enumerable.Range(0,maxBound).ToList();
+        //shuffle
+        for (int i = numbers.Count - 1; i > 0; i--)
         {
-            num = envConfig.fixedPosition;
+            int j = _random.Next(0, i);
+            int tmp = numbers[i];
+            numbers[i] = numbers[j];
+            numbers[j] = tmp;
         }
+        var randomPos = numbers.Take(envConfig.numberOfCoplay).ToList();        
 
         ApplyEnvConfig();
 
@@ -764,8 +767,12 @@ public class DodgeBallGameController : MonoBehaviour
         if( (trainerStatus.learningTeamId == 0) || (envConfig.coplayLearningTeamOnly == false) ){
             foreach (var item in Team0Players)
             {
-                if (playerIndex == num)
+                if (randomPos.IndexOf(playerIndex) != -1)
                 {
+                    if (envConfig.sameModel == false)
+                    {
+                        modelIndex = Random.Range(0, modelList.Count);
+                    }
                     print("setting agent with id=" + playerIndex + " in team0 to model id=" + modelIndex);
                     //item.Agent.SetModel(modelPathList[modelIndex], modelList[modelIndex]);
                     var bp = item.Agent.GetComponent<BehaviorParameters>();
@@ -778,21 +785,27 @@ public class DodgeBallGameController : MonoBehaviour
         }
 
         playerIndex = 0;
-        num = Random.Range(0, maxBound);
-        if (envConfig.fixedPosition != -1)
+        
+        numbers = Enumerable.Range(0,maxBound).ToList();
+        //shuffle
+        for (int i = numbers.Count - 1; i > 0; i--)
         {
-            num = envConfig.fixedPosition;
+            int j = _random.Next(0, i);
+            int tmp = numbers[i];
+            numbers[i] = numbers[j];
+            numbers[j] = tmp;
         }
-        if (envConfig.sameModel == false)
-        {
-            modelIndex = Random.Range(0, modelList.Count);
-        }
+        randomPos = numbers.Take(envConfig.numberOfCoplay).ToList();                
 
         if( (trainerStatus.learningTeamId == 1) || (envConfig.coplayLearningTeamOnly == false) ){
             foreach (var item in Team1Players)
             {
-                if (playerIndex == num)
+                if (randomPos.IndexOf(playerIndex) != -1)
                 {
+                    if (envConfig.sameModel == false)
+                    {
+                        modelIndex = Random.Range(0, modelList.Count);
+                    }
                     print("setting agent with id=" + playerIndex + " in team1 to model id=" + modelIndex);
                     //item.Agent.SetModel(modelPathList[modelIndex], modelList[modelIndex]);
                     var bp = item.Agent.GetComponent<BehaviorParameters>();

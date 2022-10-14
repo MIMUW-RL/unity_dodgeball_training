@@ -1,4 +1,4 @@
-fixedPosition : -1
 coplayLearningTeamOnly : true
 sameModel : false
 trainerStatusPath : "trainer_status.yaml"
+numberOfCoplay : 1
