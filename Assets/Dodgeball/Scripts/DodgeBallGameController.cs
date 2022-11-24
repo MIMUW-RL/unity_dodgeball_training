@@ -165,10 +165,10 @@ public class DodgeBallGameController : MonoBehaviour
     void InitializeModelList()
     {
         //gamePlanDirectory
-        string[] filePaths = Directory.GetFiles("models", "*.onnx");
+        string[] filePaths = Directory.GetFiles("models", "*.onnx");
         foreach (string path in filePaths)
         {
-            Debug.Log("Loading  model ");
+            Debug.Log("Loading model ");
             Debug.Log(path);
             String modelName = path.Replace(".onnx", "");
             modelPathList.Add(modelName);
