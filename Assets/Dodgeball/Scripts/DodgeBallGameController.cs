@@ -32,7 +32,10 @@ public class EnvConfig
     public bool sameModel;
     public bool coplayLearningTeamOnly;
     public string trainerStatusPath;
-    public int numberOfCoplay;
+    public int numberOfCoplayAgents;
+    public string modelPath;
+    public int keepModels;
+    public float selfPlayRatio;
 }
 
 
@@ -162,22 +165,55 @@ public class DodgeBallGameController : MonoBehaviour
     public List<NNModel> modelList = new List<NNModel>();
     private ModelOverrider myModelOverrider;
 
-    void InitializeModelList()
-    {
-        //gamePlanDirectory
-        string[] filePaths = Directory.GetFiles("models", "*.onnx");
+    void CheckAndAppendNewModels(){
+        string[] filePaths = Directory.GetFiles(envConfig.modelPath, "*.onnx");
         foreach (string path in filePaths)
         {
-            Debug.Log("Loading model ");
-            Debug.Log(path);
             String modelName = path.Replace(".onnx", "");
-            modelPathList.Add(modelName);
-            byte[] rawModel = File.ReadAllBytes(path);
-            NNModel nnModel = myModelOverrider.LoadOnnxModel(rawModel);
-            nnModel.name = modelName;
-            modelList.Add(nnModel);
+            if(modelPathList.Contains(modelName) == false)
+            {                
+                if(modelList.Count >= envConfig.keepModels)
+                {
+                    Debug.Log("modelList is full, cycling the first model in list");
+                    Debug.Log(modelList.Count);
+                    Debug.Log("removing");
+                    Debug.Log(modelPathList[0]);
+                    modelPathList.RemoveAt(0);
+                    modelList.RemoveAt(0);                    
+                }
+                Debug.Log("Found new model in modelPath, appending to modelList");
+                Debug.Log(path);
+                modelPathList.Add(modelName);
+                Debug.Log(String.Concat("modelList size = ", modelList.Count));
+                byte[] rawModel = File.ReadAllBytes(path);
+                NNModel nnModel = myModelOverrider.LoadOnnxModel(rawModel);
+                nnModel.name = modelName;
+                modelList.Add(nnModel);
+            }
         }
+    }
 
+    void InitializeModelList()
+    {
+        Debug.Log("Loading models from path");
+        Debug.Log(envConfig.modelPath);
+        string[] filePaths = Directory.GetFiles(envConfig.modelPath, "*.onnx");
+        if(filePaths.Length == 0)
+        {
+            Debug.Log("path is empty NO models loaded");
+        }else{
+            foreach (string path in filePaths)
+            {
+                Debug.Log("Loading model ");
+                Debug.Log(path);
+                String modelName = path.Replace(".onnx", "");
+                modelPathList.Add(modelName);
+                byte[] rawModel = File.ReadAllBytes(path);
+                NNModel nnModel = myModelOverrider.LoadOnnxModel(rawModel);
+                nnModel.name = modelName;
+                modelList.Add(nnModel);
+            }
+        }
     }
 
     void Start()
@@ -743,93 +779,107 @@ public class DodgeBallGameController : MonoBehaviour
             m_Team1AgentGroup.RegisterAgent(item.Agent);
         }
 
-        //implementation of FCP injections
+        ApplyEnvConfig();
+        //check for new models
+        CheckAndAppendNewModels();
+
+        //BEGIN implementation of FCP injections 
         int maxBound = 4;
-        int coplayNr = envConfig.numberOfCoplay;
+        int coplayNr = envConfig.numberOfCoplayAgents;
         
         var _random = new System.Random();
 
-        var numbers = Enumerable.Range(0,maxBound).ToList();
-        //shuffle
-        for (int i = numbers.Count - 1; i > 0; i--)
+        //perform fictitious co-play only if there is at least one model in the list
+        if(modelList.Count > 0)
         {
-            int j = _random.Next(0, i);
-            int tmp = numbers[i];
-            numbers[i] = numbers[j];
-            numbers[j] = tmp;
-        }
-        var randomPos = numbers.Take(envConfig.numberOfCoplay).ToList();        
-
-        ApplyEnvConfig();
-
-        int modelIndex = Random.Range(0, modelList.Count);
-        int playerIndex = 0;
-        if( (trainerStatus.learningTeamId == 0) || (envConfig.coplayLearningTeamOnly == false) ){
-            foreach (var item in Team0Players)
+            //perform ficitious co-play according to the ratio given in config yaml
+            var n = _random.NextDouble();
+            if( n < envConfig.selfPlayRatio )
             {
-                if (randomPos.IndexOf(playerIndex) != -1)
-                {
-                    if (envConfig.sameModel == false)
-                    {
-                        modelIndex = Random.Range(0, modelList.Count);
-                    }
-                    print("setting agent with id=" + playerIndex + " in team0 to model id=" + modelIndex);
-                    //item.Agent.SetModel(modelPathList[modelIndex], modelList[modelIndex]);
-                    var bp = item.Agent.GetComponent<BehaviorParameters>();
-                    bp.Model = modelList[modelIndex];
-                    bp.BehaviorType = Unity.MLAgents.Policies.BehaviorType.InferenceOnly;
-                    bp.DeterministicInference = true;
-                }
-                playerIndex++;
-            }
-        }
-
-        playerIndex = 0;
-        
-        numbers = Enumerable.Range(0,maxBound).ToList();
-        //shuffle
-        for (int i = numbers.Count - 1; i > 0; i--)
-        {
-            int j = _random.Next(0, i);
-            int tmp = numbers[i];
-            numbers[i] = numbers[j];
-            numbers[j] = tmp;
-        }
-        randomPos = numbers.Take(envConfig.numberOfCoplay).ToList();                
-
-        if( (trainerStatus.learningTeamId == 1) || (envConfig.coplayLearningTeamOnly == false) ){
-            foreach (var item in Team1Players)
+                Debug.Log(String.Concat("Drafted ", n, " which is less than spr ", envConfig.selfPlayRatio));
+            }else
             {
-                if (randomPos.IndexOf(playerIndex) != -1)
+                var numbers = Enumerable.Range(0,maxBound).ToList();
+                //shuffle
+                for (int i = numbers.Count - 1; i > 0; i--)
                 {
-                    if (envConfig.sameModel == false)
-                    {
-                        modelIndex = Random.Range(0, modelList.Count);
-                    }
-                    print("setting agent with id=" + playerIndex + " in team1 to model id=" + modelIndex);
-                    //item.Agent.SetModel(modelPathList[modelIndex], modelList[modelIndex]);
-                    var bp = item.Agent.GetComponent<BehaviorParameters>();
-                    bp.Model = modelList[modelIndex];
-                    bp.BehaviorType = Unity.MLAgents.Policies.BehaviorType.InferenceOnly;
-                    bp.DeterministicInference = true;
+                    int j = _random.Next(0, i);
+                    int tmp = numbers[i];
+                    numbers[i] = numbers[j];
+                    numbers[j] = tmp;
                 }
-                playerIndex++;
+                var randomPos = numbers.Take(envConfig.numberOfCoplayAgents).ToList();
+                int modelIndex = Random.Range(0, modelList.Count);
+                int playerIndex = 0;
+                if( (trainerStatus.learningTeamId == 0) || (envConfig.coplayLearningTeamOnly == false) ){
+                    foreach (var item in Team0Players)
+                    {
+                        if (randomPos.IndexOf(playerIndex) != -1)
+                        {
+                            if (envConfig.sameModel == false)
+                            {
+                                modelIndex = Random.Range(0, modelList.Count);
+                            }
+                            print("setting agent with id=" + playerIndex + " in team0 to model id=" + modelIndex);
+                            //item.Agent.SetModel(modelPathList[modelIndex], modelList[modelIndex]);
+                            var bp = item.Agent.GetComponent<BehaviorParameters>();
+                            bp.Model = modelList[modelIndex];
+                            bp.BehaviorType = Unity.MLAgents.Policies.BehaviorType.InferenceOnly;
+                            bp.DeterministicInference = true;
+                            
+                        }
+                        playerIndex++;
+                    }
+                }
+
+                playerIndex = 0;
+                
+                numbers = Enumerable.Range(0,maxBound).ToList();
+                //shuffle
+                for (int i = numbers.Count - 1; i > 0; i--)
+                {
+                    int j = _random.Next(0, i);
+                    int tmp = numbers[i];
+                    numbers[i] = numbers[j];
+                    numbers[j] = tmp;
+                }
+                randomPos = numbers.Take(envConfig.numberOfCoplayAgents).ToList();                
+
+                if( (trainerStatus.learningTeamId == 1) || (envConfig.coplayLearningTeamOnly == false) ){
+                    foreach (var item in Team1Players)
+                    {
+                        if (randomPos.IndexOf(playerIndex) != -1)
+                        {
+                            if (envConfig.sameModel == false)
+                            {
+                                modelIndex = Random.Range(0, modelList.Count);
+                            }
+                            print("setting agent with id=" + playerIndex + " in team1 to model id=" + modelIndex);
+                            //item.Agent.SetModel(modelPathList[modelIndex], modelList[modelIndex]);
+                            var bp = item.Agent.GetComponent<BehaviorParameters>();
+                            bp.Model = modelList[modelIndex];
+                            bp.BehaviorType = Unity.MLAgents.Policies.BehaviorType.InferenceOnly;
+                            bp.DeterministicInference = true;
+                        }
+                        playerIndex++;
+                    }
+                }
             }
-        }
 
-        if (GameMode == GameModeType.CaptureTheFlag)
-        {
-            resetTeam1Flag();
-            resetTeam0Flag();
-        }
-        else
-        {
-            Team0Flag.gameObject.SetActive(false);
-            Team1Flag.gameObject.SetActive(false);
-        }
+            if (GameMode == GameModeType.CaptureTheFlag)
+            {
+                resetTeam1Flag();
+                resetTeam0Flag();
+            }
+            else
+            {
+                Team0Flag.gameObject.SetActive(false);
+                Team1Flag.gameObject.SetActive(false);
+            }
 
-        SetActiveLosers(blueLosersList, 0);
-        SetActiveLosers(purpleLosersList, 0);
+            SetActiveLosers(blueLosersList, 0);
+            SetActiveLosers(purpleLosersList, 0);
+        }
     }
 
     // Update is called once per frame
