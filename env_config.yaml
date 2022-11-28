@@ -3,5 +3,5 @@ sameModel : false
 trainerStatusPath : "trainer_status.yaml"
 numberOfCoplayAgents : 1
 modelPath : "results/new/DodgeBall"
-keepModels : 10
+keepModels : 100
 selfPlayRatio: 0.5

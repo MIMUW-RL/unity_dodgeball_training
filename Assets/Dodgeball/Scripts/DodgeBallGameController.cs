@@ -174,21 +174,23 @@ public class DodgeBallGameController : MonoBehaviour
             {                
                 if(modelList.Count >= envConfig.keepModels)
                 {
-                    Debug.Log("modelList is full, cycling the first model in list");
+                    //todo: it is bugged, rewrite
+                    Debug.Log("modelList is full, not adding model");
                     Debug.Log(modelList.Count);
-                    Debug.Log("removing");
-                    Debug.Log(modelPathList[0]);
-                    modelPathList.RemoveAt(0);
-                    modelList.RemoveAt(0);                    
+                    //Debug.Log("removing");
+                    //Debug.Log(modelPathList[0]);
+                    //modelPathList.RemoveAt(0);
+                    //modelList.RemoveAt(0);                    
+                }else{
+                    Debug.Log("Found new model in modelPath, appending to modelList");
+                    Debug.Log(path);
+                    modelPathList.Add(modelName);                    
+                    byte[] rawModel = File.ReadAllBytes(path);
+                    NNModel nnModel = myModelOverrider.LoadOnnxModel(rawModel);
+                    nnModel.name = modelName;
+                    modelList.Add(nnModel);
+                    Debug.Log(String.Concat("modelList size = ", modelList.Count));
                 }
-                Debug.Log("Found new model in modelPath, appending to modelList");
-                Debug.Log(path);
-                modelPathList.Add(modelName);
-                Debug.Log(String.Concat("modelList size = ", modelList.Count));
-                byte[] rawModel = File.ReadAllBytes(path);
-                NNModel nnModel = myModelOverrider.LoadOnnxModel(rawModel);
-                nnModel.name = modelName;
-                modelList.Add(nnModel);
             }
         }
     }
