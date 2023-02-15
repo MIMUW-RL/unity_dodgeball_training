@@ -92,6 +92,7 @@ public class CoPlayModels : MonoBehaviour
 
     public void CheckAndAppendNewModels()
     {
+        ApplyEnvConfig();
         string[] filePaths = Directory.GetFiles(envConfig.modelPath, "*.onnx");
         foreach (string path in filePaths)
         {
