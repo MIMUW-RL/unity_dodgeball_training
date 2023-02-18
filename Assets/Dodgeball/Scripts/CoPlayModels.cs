@@ -78,7 +78,7 @@ public class CoPlayModels : MonoBehaviour
 
     void Start()
     {
-        myModelOverrider = GetComponentInChildren<ModelOverrider>();
+        myModelOverrider = transform.parent.GetComponentInChildren<ModelOverrider>();
         if (myModelOverrider == null) {
             Debug.Log("Overrider null");
 
