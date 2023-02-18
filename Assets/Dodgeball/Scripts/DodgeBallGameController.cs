@@ -144,8 +144,6 @@ public class DodgeBallGameController : MonoBehaviour
 
     void Start()
     {
-        modelCollector = GetComponentInParent<CoPlayModels>();
-
         if (ShouldPlayEffects)
         {
             ResetPlayerUI();
