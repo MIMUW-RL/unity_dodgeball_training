@@ -38,7 +38,7 @@ public class CoPlayModels : MonoBehaviour
 
     public List<string> modelPathList = new List<string>();
     public List<NNModel> modelList = new List<NNModel>();
-    private ModelOverrider myModelOverrider;
+    public ModelOverrider myModelOverrider;
 
     private void ApplyEnvConfig() {
         var deserializer = new YamlDotNet.Serialization.DeserializerBuilder()
@@ -78,7 +78,6 @@ public class CoPlayModels : MonoBehaviour
 
     void Start()
     {
-        myModelOverrider = transform.parent.GetComponentInChildren<ModelOverrider>();
         if (myModelOverrider == null) {
             Debug.Log("Overrider null");
 

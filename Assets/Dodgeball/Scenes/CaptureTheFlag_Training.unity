@@ -7703,6 +7703,7 @@ MonoBehaviour:
     learningTeamId: 0
   modelPathList: []
   modelList: []
+  myModelOverrider: {fileID: 1009637461}
 --- !u!4 &897729736
 Transform:
   m_ObjectHideFlags: 0
@@ -9062,6 +9063,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2269235b415ab42d3a31336e5cf3ee22, type: 3}
+--- !u!114 &1009637461 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5895108533257108359, guid: 2269235b415ab42d3a31336e5cf3ee22,
+    type: 3}
+  m_PrefabInstance: {fileID: 1009637460}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a6da8f78a394c6ab027688eab81e04d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1010590164
 GameObject:
   m_ObjectHideFlags: 0
@@ -10975,7 +10988,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1367967954}
-  m_LocalRotation: {x: -1.3877794e-17, y: 0.9997235, z: -0.023514427, w: -4.440892e-16}
+  m_LocalRotation: {x: 8.7598005e-11, y: 0.9997235, z: -0.02351441, w: 0.0000000037242602}
   m_LocalPosition: {x: 32, y: 3.1269999, z: 14.56}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -19736,7 +19749,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8697938321410268827}
-  m_LocalRotation: {x: -1.3877794e-17, y: 0.9997235, z: -0.023514427, w: -4.440892e-16}
+  m_LocalRotation: {x: 8.7598005e-11, y: 0.9997235, z: -0.02351441, w: 0.0000000037242602}
   m_LocalPosition: {x: 32, y: 3.1269999, z: 14.56}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
