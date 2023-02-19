@@ -669,7 +669,7 @@ public class DodgeBallGameController : MonoBehaviour
             item.Agent.ResetAgent();
             var bp = item.Agent.GetComponent<BehaviorParameters>();
             bp.BehaviorType = Unity.MLAgents.Policies.BehaviorType.Default;
-            bp.Model = null;
+            item.Agent.SetModel("DodgeBall", null);
             bp.DeterministicInference = false;
             m_Team0AgentGroup.RegisterAgent(item.Agent);
         }
@@ -684,7 +684,7 @@ public class DodgeBallGameController : MonoBehaviour
             item.Agent.ResetAgent();
             var bp = item.Agent.GetComponent<BehaviorParameters>();
             bp.BehaviorType = Unity.MLAgents.Policies.BehaviorType.Default;
-            bp.Model = null;
+            item.Agent.SetModel("DodgeBall", null);
             bp.DeterministicInference = false;
             m_Team1AgentGroup.RegisterAgent(item.Agent);
         }
@@ -730,12 +730,10 @@ public class DodgeBallGameController : MonoBehaviour
                                 modelIndex = Random.Range(0, modelCollector.modelList.Count);
                             }
                             print("setting agent with id=" + playerIndex + " in team0 to model id=" + modelIndex);
-                            //item.Agent.SetModel(modelPathList[modelIndex], modelList[modelIndex]);
                             var bp = item.Agent.GetComponent<BehaviorParameters>();
-                            bp.Model = modelCollector.modelList[modelIndex];
-                            bp.BehaviorType = Unity.MLAgents.Policies.BehaviorType.InferenceOnly;
                             bp.DeterministicInference = true;
-                            
+                            item.Agent.SetModel(modelCollector.modelPathList[modelIndex], modelCollector.modelList[modelIndex]);
+                            bp.BehaviorType = Unity.MLAgents.Policies.BehaviorType.InferenceOnly;
                         }
                         playerIndex++;
                     }
@@ -764,11 +762,10 @@ public class DodgeBallGameController : MonoBehaviour
                                 modelIndex = Random.Range(0, modelCollector.modelList.Count);
                             }
                             print("setting agent with id=" + playerIndex + " in team1 to model id=" + modelIndex);
-                            //item.Agent.SetModel(modelPathList[modelIndex], modelList[modelIndex]);
                             var bp = item.Agent.GetComponent<BehaviorParameters>();
-                            bp.Model = modelCollector.modelList[modelIndex];
-                            bp.BehaviorType = Unity.MLAgents.Policies.BehaviorType.InferenceOnly;
                             bp.DeterministicInference = true;
+                            item.Agent.SetModel(modelCollector.modelPathList[modelIndex], modelCollector.modelList[modelIndex]);
+                            bp.BehaviorType = Unity.MLAgents.Policies.BehaviorType.InferenceOnly;
                         }
                         playerIndex++;
                     }
