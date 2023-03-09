@@ -20,24 +20,6 @@ using System.Text;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
-[Serializable]
-public class TrainerStatus
-{
-    public int learningTeamId;
-}
-
-[Serializable]
-public class EnvConfig
-{     
-    public bool sameModel;
-    public bool coplayLearningTeamOnly;
-    public string trainerStatusPath;
-    public int numberOfCoplayAgents;
-    public string modelPath;
-    public int keepModels;
-    public float selfPlayRatio;
-}
-
 
 public class DodgeBallGameController : MonoBehaviour
 {
@@ -50,9 +32,6 @@ public class DodgeBallGameController : MonoBehaviour
         Movie,
     }
 
-    public string EnvConfigPath = @"env_config.yaml";
-    public EnvConfig envConfig;
-    public TrainerStatus trainerStatus;
 
     public SceneType CurrentSceneType = SceneType.Training;
 
@@ -161,67 +140,10 @@ public class DodgeBallGameController : MonoBehaviour
 
     public int MaxEnvironmentSteps = 5000;
 
-    public List<string> modelPathList = new List<string>();
-    public List<NNModel> modelList = new List<NNModel>();
-    private ModelOverrider myModelOverrider;
-
-    void CheckAndAppendNewModels(){
-        string[] filePaths = Directory.GetFiles(envConfig.modelPath, "*.onnx");
-        foreach (string path in filePaths)
-        {
-            String modelName = path.Replace(".onnx", "");
-            if(modelPathList.Contains(modelName) == false)
-            {                
-                if(modelList.Count >= envConfig.keepModels)
-                {
-                    //todo: it is bugged, rewrite
-                    Debug.Log("modelList is full, not adding model");
-                    Debug.Log(modelList.Count);
-                    //Debug.Log("removing");
-                    //Debug.Log(modelPathList[0]);
-                    //modelPathList.RemoveAt(0);
-                    //modelList.RemoveAt(0);                    
-                }else{
-                    Debug.Log("Found new model in modelPath, appending to modelList");
-                    Debug.Log(path);
-                    modelPathList.Add(modelName);                    
-                    byte[] rawModel = File.ReadAllBytes(path);
-                    NNModel nnModel = myModelOverrider.LoadOnnxModel(rawModel);
-                    nnModel.name = modelName;
-                    modelList.Add(nnModel);
-                    Debug.Log(String.Concat("modelList size = ", modelList.Count));
-                }
-            }
-        }
-    }
-
-    void InitializeModelList()
-    {
-        Debug.Log("Loading models from path");
-        Debug.Log(envConfig.modelPath);
-        string[] filePaths = Directory.GetFiles(envConfig.modelPath, "*.onnx");
-        if(filePaths.Length == 0)
-        {
-            Debug.Log("path is empty NO models loaded");
-        }else{
-            foreach (string path in filePaths)
-            {
-                Debug.Log("Loading model ");
-                Debug.Log(path);
-                String modelName = path.Replace(".onnx", "");
-                modelPathList.Add(modelName);
-                byte[] rawModel = File.ReadAllBytes(path);
-                NNModel nnModel = myModelOverrider.LoadOnnxModel(rawModel);
-                nnModel.name = modelName;
-                modelList.Add(nnModel);
-            }
-        }
-    }
+    public CoPlayModels modelCollector;
 
     void Start()
     {
-        myModelOverrider = GetComponentInChildren<ModelOverrider>();
-
         if (ShouldPlayEffects)
         {
             ResetPlayerUI();
@@ -229,7 +151,6 @@ public class DodgeBallGameController : MonoBehaviour
     }
 
     void Initialize() {
-        ApplyEnvConfig();
 
         m_audioSource = gameObject.AddComponent<AudioSource>();
         m_StatsRecorder = Academy.Instance.StatsRecorder;
@@ -267,20 +188,7 @@ public class DodgeBallGameController : MonoBehaviour
             }
         }
         m_Initialized = true;
-        InitializeModelList();
         ResetScene();
-    }
-
-    private void ApplyEnvConfig() {
-        var deserializer = new YamlDotNet.Serialization.DeserializerBuilder()
-    .WithNamingConvention(CamelCaseNamingConvention.Instance)
-    .Build();
-        string yaml = File.ReadAllText(EnvConfigPath);
-        envConfig = deserializer.Deserialize<EnvConfig>(yaml);
-        //print("loading: " + envConfig.trainerStatusPath);
-        yaml = File.ReadAllText(envConfig.trainerStatusPath);
-        trainerStatus = deserializer.Deserialize<TrainerStatus>(yaml);
-        //print("trainerStatus.learningTeamId: " + trainerStatus.learningTeamId);
     }
 
     //Instantiate balls and add them to the pool
@@ -761,7 +669,7 @@ public class DodgeBallGameController : MonoBehaviour
             item.Agent.ResetAgent();
             var bp = item.Agent.GetComponent<BehaviorParameters>();
             bp.BehaviorType = Unity.MLAgents.Policies.BehaviorType.Default;
-            bp.Model = null;
+            item.Agent.SetModel("DodgeBall", null);
             bp.DeterministicInference = false;
             m_Team0AgentGroup.RegisterAgent(item.Agent);
         }
@@ -776,29 +684,28 @@ public class DodgeBallGameController : MonoBehaviour
             item.Agent.ResetAgent();
             var bp = item.Agent.GetComponent<BehaviorParameters>();
             bp.BehaviorType = Unity.MLAgents.Policies.BehaviorType.Default;
-            bp.Model = null;
+            item.Agent.SetModel("DodgeBall", null);
             bp.DeterministicInference = false;
             m_Team1AgentGroup.RegisterAgent(item.Agent);
         }
 
-        ApplyEnvConfig();
         //check for new models
-        CheckAndAppendNewModels();
+        modelCollector.CheckAndAppendNewModels();
 
         //BEGIN implementation of FCP injections 
         int maxBound = 4;
-        int coplayNr = envConfig.numberOfCoplayAgents;
+        int coplayNr = modelCollector.envConfig.numberOfCoplayAgents;
         
         var _random = new System.Random();
 
         //perform fictitious co-play only if there is at least one model in the list
-        if(modelList.Count > 0)
+        if(modelCollector.modelList.Count > 0)
         {
             //perform ficitious co-play according to the ratio given in config yaml
             var n = _random.NextDouble();
-            if( n < envConfig.selfPlayRatio )
+            if( n < modelCollector.envConfig.selfPlayRatio )
             {
-                Debug.Log(String.Concat("Drafted ", n, " which is less than spr ", envConfig.selfPlayRatio));
+                Debug.Log(String.Concat("Drafted ", n, " which is less than spr ", modelCollector.envConfig.selfPlayRatio));
             }else
             {
                 var numbers = Enumerable.Range(0,maxBound).ToList();
@@ -810,25 +717,23 @@ public class DodgeBallGameController : MonoBehaviour
                     numbers[i] = numbers[j];
                     numbers[j] = tmp;
                 }
-                var randomPos = numbers.Take(envConfig.numberOfCoplayAgents).ToList();
-                int modelIndex = Random.Range(0, modelList.Count);
+                var randomPos = numbers.Take(modelCollector.envConfig.numberOfCoplayAgents).ToList();
+                int modelIndex = Random.Range(0, modelCollector.modelList.Count);
                 int playerIndex = 0;
-                if( (trainerStatus.learningTeamId == 0) || (envConfig.coplayLearningTeamOnly == false) ){
+                if( (modelCollector.trainerStatus.learningTeamId == 0) || (modelCollector.envConfig.coplayLearningTeamOnly == false) ){
                     foreach (var item in Team0Players)
                     {
                         if (randomPos.IndexOf(playerIndex) != -1)
                         {
-                            if (envConfig.sameModel == false)
+                            if (modelCollector.envConfig.sameModel == false)
                             {
-                                modelIndex = Random.Range(0, modelList.Count);
+                                modelIndex = Random.Range(0, modelCollector.modelList.Count);
                             }
                             print("setting agent with id=" + playerIndex + " in team0 to model id=" + modelIndex);
-                            //item.Agent.SetModel(modelPathList[modelIndex], modelList[modelIndex]);
                             var bp = item.Agent.GetComponent<BehaviorParameters>();
-                            bp.Model = modelList[modelIndex];
-                            bp.BehaviorType = Unity.MLAgents.Policies.BehaviorType.InferenceOnly;
                             bp.DeterministicInference = true;
-                            
+                            item.Agent.SetModel(modelCollector.modelPathList[modelIndex], modelCollector.modelList[modelIndex]);
+                            bp.BehaviorType = Unity.MLAgents.Policies.BehaviorType.InferenceOnly;
                         }
                         playerIndex++;
                     }
@@ -845,23 +750,22 @@ public class DodgeBallGameController : MonoBehaviour
                     numbers[i] = numbers[j];
                     numbers[j] = tmp;
                 }
-                randomPos = numbers.Take(envConfig.numberOfCoplayAgents).ToList();                
+                randomPos = numbers.Take(modelCollector.envConfig.numberOfCoplayAgents).ToList();                
 
-                if( (trainerStatus.learningTeamId == 1) || (envConfig.coplayLearningTeamOnly == false) ){
+                if( (modelCollector.trainerStatus.learningTeamId == 1) || (modelCollector.envConfig.coplayLearningTeamOnly == false) ){
                     foreach (var item in Team1Players)
                     {
                         if (randomPos.IndexOf(playerIndex) != -1)
                         {
-                            if (envConfig.sameModel == false)
+                            if (modelCollector.envConfig.sameModel == false)
                             {
-                                modelIndex = Random.Range(0, modelList.Count);
+                                modelIndex = Random.Range(0, modelCollector.modelList.Count);
                             }
                             print("setting agent with id=" + playerIndex + " in team1 to model id=" + modelIndex);
-                            //item.Agent.SetModel(modelPathList[modelIndex], modelList[modelIndex]);
                             var bp = item.Agent.GetComponent<BehaviorParameters>();
-                            bp.Model = modelList[modelIndex];
-                            bp.BehaviorType = Unity.MLAgents.Policies.BehaviorType.InferenceOnly;
                             bp.DeterministicInference = true;
+                            item.Agent.SetModel(modelCollector.modelPathList[modelIndex], modelCollector.modelList[modelIndex]);
+                            bp.BehaviorType = Unity.MLAgents.Policies.BehaviorType.InferenceOnly;
                         }
                         playerIndex++;
                     }
