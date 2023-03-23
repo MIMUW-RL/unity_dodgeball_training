@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.45140404, g: 0.50089407, b: 0.5723157, a: 1}
+  m_IndirectSpecularColor: {r: 0.45140374, g: 0.5008937, b: 0.5723153, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2824,6 +2824,11 @@ PrefabInstance:
       propertyPath: m_ConnectedAnchor.y
       value: 0.62643296
       objectReference: {fileID: 0}
+    - target: {fileID: 4993607472596837024, guid: 5cc1d375350254c0585ef6e96a4ed1e5,
+        type: 3}
+      propertyPath: modelCollector
+      value: 
+      objectReference: {fileID: 1131024724}
     - target: {fileID: 4993607472596837027, guid: 5cc1d375350254c0585ef6e96a4ed1e5,
         type: 3}
       propertyPath: m_Name
@@ -5270,6 +5275,11 @@ PrefabInstance:
       propertyPath: m_ConnectedAnchor.y
       value: 0.62643296
       objectReference: {fileID: 0}
+    - target: {fileID: 4993607472596837024, guid: 5cc1d375350254c0585ef6e96a4ed1e5,
+        type: 3}
+      propertyPath: modelCollector
+      value: 
+      objectReference: {fileID: 1131024724}
     - target: {fileID: 4993607472596837027, guid: 5cc1d375350254c0585ef6e96a4ed1e5,
         type: 3}
       propertyPath: m_Name
@@ -6884,6 +6894,11 @@ PrefabInstance:
       propertyPath: m_ConnectedAnchor.y
       value: 0.62643296
       objectReference: {fileID: 0}
+    - target: {fileID: 4993607472596837024, guid: 5cc1d375350254c0585ef6e96a4ed1e5,
+        type: 3}
+      propertyPath: modelCollector
+      value: 
+      objectReference: {fileID: 1131024724}
     - target: {fileID: 4993607472596837027, guid: 5cc1d375350254c0585ef6e96a4ed1e5,
         type: 3}
       propertyPath: m_Name
@@ -9485,6 +9500,11 @@ PrefabInstance:
       propertyPath: m_ConnectedAnchor.y
       value: 0.62643296
       objectReference: {fileID: 0}
+    - target: {fileID: 4993607472596837024, guid: 5cc1d375350254c0585ef6e96a4ed1e5,
+        type: 3}
+      propertyPath: modelCollector
+      value: 
+      objectReference: {fileID: 1131024724}
     - target: {fileID: 4993607472596837027, guid: 5cc1d375350254c0585ef6e96a4ed1e5,
         type: 3}
       propertyPath: m_Name
@@ -11140,6 +11160,11 @@ PrefabInstance:
       propertyPath: m_ConnectedAnchor.y
       value: 0.62643296
       objectReference: {fileID: 0}
+    - target: {fileID: 4993607472596837024, guid: 5cc1d375350254c0585ef6e96a4ed1e5,
+        type: 3}
+      propertyPath: modelCollector
+      value: 
+      objectReference: {fileID: 1131024724}
     - target: {fileID: 4993607472596837027, guid: 5cc1d375350254c0585ef6e96a4ed1e5,
         type: 3}
       propertyPath: m_Name
@@ -13119,6 +13144,11 @@ PrefabInstance:
       propertyPath: m_ConnectedAnchor.y
       value: 0.62643296
       objectReference: {fileID: 0}
+    - target: {fileID: 4993607472596837024, guid: 5cc1d375350254c0585ef6e96a4ed1e5,
+        type: 3}
+      propertyPath: modelCollector
+      value: 
+      objectReference: {fileID: 1131024724}
     - target: {fileID: 4993607472596837027, guid: 5cc1d375350254c0585ef6e96a4ed1e5,
         type: 3}
       propertyPath: m_Name
@@ -13632,6 +13662,64 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1128407473}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1131024723
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1131024725}
+  - component: {fileID: 1131024724}
+  m_Layer: 0
+  m_Name: ModelCollector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1131024724
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1131024723}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27699da2c5d5a4c04a5ce10acaa862de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  EnvConfigPath: env_config.yaml
+  envConfig:
+    sameModel: 0
+    coplayLearningTeamOnly: 0
+    trainerStatusPath: 
+    numberOfCoplayAgents: 0
+    modelPath: 
+    keepModels: 0
+    selfPlayRatio: 0
+  trainerStatus:
+    learningTeamId: 0
+  modelPathList: []
+  modelList: []
+  myModelOverrider: {fileID: 2092824313}
+--- !u!4 &1131024725
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1131024723}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 23
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1137767715
 GameObject:
   m_ObjectHideFlags: 0
@@ -15344,6 +15432,11 @@ PrefabInstance:
       propertyPath: m_ConnectedAnchor.y
       value: 0.62643296
       objectReference: {fileID: 0}
+    - target: {fileID: 4993607472596837024, guid: 5cc1d375350254c0585ef6e96a4ed1e5,
+        type: 3}
+      propertyPath: modelCollector
+      value: 
+      objectReference: {fileID: 1131024724}
     - target: {fileID: 4993607472596837027, guid: 5cc1d375350254c0585ef6e96a4ed1e5,
         type: 3}
       propertyPath: m_Name
@@ -15916,6 +16009,13 @@ MonoBehaviour:
   m_ChannelMask: 1
   m_Gain: 1
   m_Use2DDistance: 0
+  m_UseCameraSpace: 0
+  m_ReactionSettings:
+    m_SecondaryNoise: {fileID: 0}
+    m_AmplitudeGain: 0
+    m_FrequencyGain: 0
+    m_Duration: 0
+    m_NoiseOffsets: {x: 0, y: 0, z: 0}
 --- !u!114 &1367967957
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15944,8 +16044,8 @@ MonoBehaviour:
     Dutch: 0
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
-    GateFit: 0
-    m_SensorSize: {x: 1.8456376, y: 1}
+    GateFit: 2
+    m_SensorSize: {x: 1.7518182, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -15961,7 +16061,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1367967954}
-  m_LocalRotation: {x: 8.759799e-11, y: 0.9997235, z: -0.02351441, w: 0.0000000037242598}
+  m_LocalRotation: {x: -1.3877794e-17, y: 0.9997235, z: -0.023514427, w: -4.440892e-16}
   m_LocalPosition: {x: 16, y: 3.1269999, z: 15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -17296,6 +17396,11 @@ PrefabInstance:
       propertyPath: m_ConnectedAnchor.y
       value: 0.62643296
       objectReference: {fileID: 0}
+    - target: {fileID: 4993607472596837024, guid: 5cc1d375350254c0585ef6e96a4ed1e5,
+        type: 3}
+      propertyPath: modelCollector
+      value: 
+      objectReference: {fileID: 1131024724}
     - target: {fileID: 4993607472596837027, guid: 5cc1d375350254c0585ef6e96a4ed1e5,
         type: 3}
       propertyPath: m_Name
@@ -18950,6 +19055,11 @@ PrefabInstance:
       propertyPath: m_ConnectedAnchor.y
       value: 0.62643296
       objectReference: {fileID: 0}
+    - target: {fileID: 4993607472596837024, guid: 5cc1d375350254c0585ef6e96a4ed1e5,
+        type: 3}
+      propertyPath: modelCollector
+      value: 
+      objectReference: {fileID: 1131024724}
     - target: {fileID: 4993607472596837027, guid: 5cc1d375350254c0585ef6e96a4ed1e5,
         type: 3}
       propertyPath: m_Name
@@ -20720,6 +20830,11 @@ PrefabInstance:
       propertyPath: m_ConnectedAnchor.y
       value: 0.62643296
       objectReference: {fileID: 0}
+    - target: {fileID: 4993607472596837024, guid: 5cc1d375350254c0585ef6e96a4ed1e5,
+        type: 3}
+      propertyPath: modelCollector
+      value: 
+      objectReference: {fileID: 1131024724}
     - target: {fileID: 4993607472596837027, guid: 5cc1d375350254c0585ef6e96a4ed1e5,
         type: 3}
       propertyPath: m_Name
@@ -21782,6 +21897,11 @@ PrefabInstance:
       propertyPath: m_ConnectedAnchor.y
       value: 0.62643296
       objectReference: {fileID: 0}
+    - target: {fileID: 4993607472596837024, guid: 5cc1d375350254c0585ef6e96a4ed1e5,
+        type: 3}
+      propertyPath: modelCollector
+      value: 
+      objectReference: {fileID: 1131024724}
     - target: {fileID: 4993607472596837027, guid: 5cc1d375350254c0585ef6e96a4ed1e5,
         type: 3}
       propertyPath: m_Name
@@ -25501,6 +25621,11 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4993607472596837024, guid: 5cc1d375350254c0585ef6e96a4ed1e5,
+        type: 3}
+      propertyPath: modelCollector
+      value: 
+      objectReference: {fileID: 1131024724}
     - target: {fileID: 4993607472596837027, guid: 5cc1d375350254c0585ef6e96a4ed1e5,
         type: 3}
       propertyPath: m_Name
@@ -25588,6 +25713,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5cc1d375350254c0585ef6e96a4ed1e5, type: 3}
+--- !u!114 &2092824313 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5895108533257108359, guid: 5cc1d375350254c0585ef6e96a4ed1e5,
+    type: 3}
+  m_PrefabInstance: {fileID: 2092824312}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a6da8f78a394c6ab027688eab81e04d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2095421678
 GameObject:
   m_ObjectHideFlags: 0
@@ -25734,6 +25871,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_SendPointerHoverToParent: 1
   m_HorizontalAxis: Horizontal
   m_VerticalAxis: Vertical
   m_SubmitButton: Submit
@@ -26077,7 +26215,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8697938321410268827}
-  m_LocalRotation: {x: 8.759799e-11, y: 0.9997235, z: -0.02351441, w: 0.0000000037242598}
+  m_LocalRotation: {x: -1.3877794e-17, y: 0.9997235, z: -0.023514427, w: -4.440892e-16}
   m_LocalPosition: {x: 16, y: 3.1269999, z: 15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
