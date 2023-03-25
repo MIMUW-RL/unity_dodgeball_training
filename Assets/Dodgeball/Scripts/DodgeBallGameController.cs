@@ -732,7 +732,7 @@ public class DodgeBallGameController : MonoBehaviour
                             print("setting agent with id=" + playerIndex + " in team0 to model id=" + modelIndex);
                             var bp = item.Agent.GetComponent<BehaviorParameters>();
                             bp.DeterministicInference = true;
-                            item.Agent.SetModel(modelCollector.modelPathList[modelIndex], modelCollector.modelList[modelIndex]);
+                            item.Agent.SetModel("DodgeBall", modelCollector.modelList[modelIndex]);
                             bp.BehaviorType = Unity.MLAgents.Policies.BehaviorType.InferenceOnly;
                         }
                         playerIndex++;
@@ -764,7 +764,7 @@ public class DodgeBallGameController : MonoBehaviour
                             print("setting agent with id=" + playerIndex + " in team1 to model id=" + modelIndex);
                             var bp = item.Agent.GetComponent<BehaviorParameters>();
                             bp.DeterministicInference = true;
-                            item.Agent.SetModel(modelCollector.modelPathList[modelIndex], modelCollector.modelList[modelIndex]);
+                            item.Agent.SetModel("DodgeBall", modelCollector.modelList[modelIndex]);
                             bp.BehaviorType = Unity.MLAgents.Policies.BehaviorType.InferenceOnly;
                         }
                         playerIndex++;
